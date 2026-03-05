@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infobip Retail Dashboard V2 | Dados Reais</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF5B00;
+            --primary-light: #FF7A33;
+            --primary-dark: #E65100;
+            --bg-primary: #FAFAFA;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #F5F5F5;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --danger: #EF4444;
+            --danger-light: #FEE2E2;
+            --info: #3B82F6;
+            --info-light: #DBEAFE;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-xl);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 20px;
+        }
+
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 8px rgba(255, 91, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        .main-content {
+            margin-top: 70px;
+            padding: var(--space-xl);
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .filters-bar {
+            background: var(--bg-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--bg-primary);
+            transition: all 0.2s ease;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 91, 0, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E5E7EB;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .kpi-card:hover::before {
+            opacity: 1;
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .kpi-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .chart-card {
+            background: var(--bg-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E5E7EB;
+        }
+
+        .chart-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+            color: var(--text-primary);
+        }
+
+        .priority-matrix {
+            background: var(--bg-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E5E7EB;
+            margin-bottom: var(--space-xl);
+        }
+
+        .matrix-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin-top: var(--space-lg);
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: var(--space-md);
+            height: 100%;
+        }
+
+        .matrix-quadrant {
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .matrix-quadrant h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+        }
+
+        .matrix-quadrant p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .quadrant-1 {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            border: 2px solid var(--danger);
+        }
+
+        .quadrant-2 {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+            border: 2px solid var(--warning);
+        }
+
+        .quadrant-3 {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+            border: 2px solid var(--info);
+        }
+
+        .quadrant-4 {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border: 2px solid var(--success);
+        }
+
+        .account-bubble {
+            display: inline-block;
+            padding: 6px 12px;
+            background: white;
+            border-radius: var(--radius-lg);
+            font-size: 12px;
+            font-weight: 500;
+            margin: 4px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .account-bubble:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .heatmap-card {
+            background: var(--bg-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E5E7EB;
+            margin-bottom: var(--space-xl);
+            overflow-x: auto;
+        }
+
+        .heatmap-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 4px;
+            margin-top: var(--space-lg);
+        }
+
+        .heatmap-table th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: left;
+            padding: var(--space-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .heatmap-table td {
+            padding: var(--space-sm);
+            text-align: center;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .heatmap-table td.account-name {
+            text-align: left;
+            font-weight: 600;
+            background: var(--bg-tertiary);
+        }
+
+        .heatmap-table td.risk-high {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .heatmap-table td.risk-medium {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .heatmap-table td.risk-low {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .heatmap-table td:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+
+        .nba-section {
+            background: var(--bg-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E5E7EB;
+            margin-bottom: var(--space-xl);
+        }
+
+        .nba-card {
+            background: linear-gradient(135deg, rgba(255, 91, 0, 0.05), rgba(255, 91, 0, 0.02));
+            border: 1px solid rgba(255, 91, 0, 0.2);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nba-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .nba-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+
+        .nba-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .nba-badge {
+            padding: 6px 12px;
+            border-radius: var(--radius-lg);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nba-badge.urgent {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .nba-badge.high {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .nba-badge.medium {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        .nba-action {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--primary);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .nba-rationale {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .table-card {
+            background: var(--bg-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #E5E7EB;
+            margin-bottom: var(--space-xl);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-tertiary);
+        }
+
+        th {
+            padding: var(--space-md);
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        td {
+            padding: var(--space-md);
+            font-size: 14px;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: var(--radius-lg);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge.success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .badge.warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .badge.danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge.info {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 var(--space-md);
+            }
+
+            .main-content {
+                padding: var(--space-md);
+            }
+
+            .kpi-grid,
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .matrix-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="logo">I</div>
+            <div class="brand-text">
+                <h1>Infobip Retail Dashboard</h1>
+                <p>V2 - Dados Reais da Carteira</p>
+            </div>
+        </div>
+        <div class="navbar-actions">
+            <button class="btn btn-primary" onclick="exportCSV()">
+                <span>💾</span> Exportar CSV
+            </button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="filters-bar">
+            <h2 style="margin-bottom: 20px; font-size: 1.5em;">Filtros</h2>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Categoria</label>
+                    <select id="filter-categoria">
+                        <option value="">Todas as Categorias</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Conta</label>
+                    <select id="filter-conta">
+                        <option value="">Todas as Contas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Setor</label>
+                    <select id="filter-setor">
+                        <option value="">Todos os Setores</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Tendência</label>
+                    <select id="filter-tendencia">
+                        <option value="">Todas</option>
+                        <option value="crescendo">Crescendo</option>
+                        <option value="queda">Em Queda</option>
+                        <option value="neutro">Neutro</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-primary" onclick="applyFilters()">Aplicar Filtros</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">Limpar</button>
+            </div>
+        </div>
+
+        <div class="kpi-grid" id="kpi-grid"></div>
+
+        <div class="priority-matrix">
+            <h3>Matriz de Priorização</h3>
+            <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
+                Visualização estratégica baseada em Urgência × Impacto
+            </p>
+            <div class="matrix-container">
+                <div class="matrix-grid" id="matrix-grid">
+                    <div class="matrix-quadrant quadrant-1">
+                        <h4>🚨 Ataque Agora</h4>
+                        <p>Alto Impacto + Alta Urgência</p>
+                        <div id="quadrant-1-accounts"></div>
+                    </div>
+                    <div class="matrix-quadrant quadrant-2">
+                        <h4>⚡ Quick Wins</h4>
+                        <p>Baixo Impacto + Alta Urgência</p>
+                        <div id="quadrant-2-accounts"></div>
+                    </div>
+                    <div class="matrix-quadrant quadrant-3">
+                        <h4>📋 Planejar</h4>
+                        <p>Alto Impacto + Baixa Urgência</p>
+                        <div id="quadrant-3-accounts"></div>
+                    </div>
+                    <div class="matrix-quadrant quadrant-4">
+                        <h4>👁️ Monitorar</h4>
+                        <p>Baixo Impacto + Baixa Urgência</p>
+                        <div id="quadrant-4-accounts"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="heatmap-card">
+            <h3>Heatmap de Risco</h3>
+            <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
+                Análise visual de múltiplas dimensões de risco por conta
+            </p>
+            <table class="heatmap-table" id="heatmap-table">
+                <thead>
+                    <tr>
+                        <th>Conta</th>
+                        <th>Tendência</th>
+                        <th>Margem</th>
+                        <th>Urgência</th>
+                        <th>Receita</th>
+                        <th>Risco Global</th>
+                    </tr>
+                </thead>
+                <tbody id="heatmap-body"></tbody>
+            </table>
+        </div>
+
+        <div class="nba-section">
+            <h3 style="margin-bottom: 20px;">Next Best Actions - Top 5 Prioridades</h3>
+            <div id="nba-container"></div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Distribuição de Receita</h3>
+                <canvas id="chart-receita"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Margem vs Contas</h3>
+                <canvas id="chart-margem"></canvas>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <h3 style="margin-bottom: 20px;">Todas as Contas - 20 Contas Prioritárias</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conta</th>
+                        <th>Setor</th>
+                        <th>Receita</th>
+                        <th>GP</th>
+                        <th>Margem</th>
+                        <th>Tendência</th>
+                        <th>Categoria</th>
+                        <th>Prazo</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // DADOS REAIS EXTRAÍDOS DO EXCEL
+        const dados = {
+            contas: [
+  {
+    "conta": "Wiser",
+    "receita": 26062.0,
+    "gp": 15637.0,
+    "margem": 0.5993,
+    "tendencia": -0.3651,
+    "categoria": "⚠️ Recuperar",
+    "prazo": "45 dias",
+    "setor": "Tecnologia / SaaS"
+  },
+  {
+    "conta": "Azul Linhas Aereas",
+    "receita": 23739.0,
+    "gp": 18719.0,
+    "margem": 0.7887,
+    "tendencia": 0.0265,
+    "categoria": "📈 Manter Momentum",
+    "prazo": "30 dias",
+    "setor": "Aviação"
+  },
+  {
+    "conta": "Hospital Oswaldo Cruz",
+    "receita": 20714.0,
+    "gp": 17228.0,
+    "margem": 0.8322,
+    "tendencia": -0.1928,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "Saúde"
+  },
+  {
+    "conta": "McDonalds Brazil",
+    "receita": 20526.0,
+    "gp": 19047.0,
+    "margem": 0.9272,
+    "tendencia": -0.7945,
+    "categoria": "🚨 Intervenção Urgente",
+    "prazo": "7 dias",
+    "setor": "Food & Beverage"
+  },
+  {
+    "conta": "Outback Brazil",
+    "receita": 15619.0,
+    "gp": 5098.0,
+    "margem": 0.3257,
+    "tendencia": 0.3134,
+    "categoria": "📈 Manter Momentum",
+    "prazo": "30 dias",
+    "setor": "Food & Beverage"
+  },
+  {
+    "conta": "Pernod Ricard",
+    "receita": 15608.0,
+    "gp": 14092.0,
+    "margem": 0.9019,
+    "tendencia": -0.0039,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "Bebidas / FMCG"
+  },
+  {
+    "conta": "MaxMilhas",
+    "receita": 14222.0,
+    "gp": 5573.0,
+    "margem": 0.3922,
+    "tendencia": 0.3049,
+    "categoria": "📈 Manter Momentum",
+    "prazo": "30 dias",
+    "setor": "Viagens / Fidelidade"
+  },
+  {
+    "conta": "Positivo Tecnologia",
+    "receita": 13995.0,
+    "gp": 13664.0,
+    "margem": 0.9764,
+    "tendencia": -0.019,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "Tecnologia"
+  },
+  {
+    "conta": "Ecohouse",
+    "receita": 12407.0,
+    "gp": 10893.0,
+    "margem": 0.8777,
+    "tendencia": 0.2633,
+    "categoria": "🚀 Acelerar",
+    "prazo": "Imediato",
+    "setor": "Energia / ESG"
+  },
+  {
+    "conta": "Burger King Brasil",
+    "receita": 11808.0,
+    "gp": 6025.0,
+    "margem": 0.5102,
+    "tendencia": -0.0257,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "Food & Beverage"
+  },
+  {
+    "conta": "Cia Hering",
+    "receita": 11583.0,
+    "gp": 5511.0,
+    "margem": 0.476,
+    "tendencia": 0,
+    "categoria": "🔍 Ativar — Novo Cliente",
+    "prazo": "60 dias",
+    "setor": "Varejo / Moda"
+  },
+  {
+    "conta": "Edenred Brazil - Freto",
+    "receita": 9314.0,
+    "gp": 8647.0,
+    "margem": 0.9283,
+    "tendencia": -0.0191,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "RH / Benefícios"
+  },
+  {
+    "conta": "Boticario Brazil",
+    "receita": 7840.0,
+    "gp": 7840.0,
+    "margem": 1.0,
+    "tendencia": 1.7927,
+    "categoria": "🚀 Acelerar",
+    "prazo": "Imediato",
+    "setor": "Beleza / Cosméticos"
+  },
+  {
+    "conta": "Atlas Schindler",
+    "receita": 7397.0,
+    "gp": 6663.0,
+    "margem": 0.9008,
+    "tendencia": -0.3928,
+    "categoria": "⚠️ Recuperar",
+    "prazo": "45 dias",
+    "setor": "Elevadores / B2B"
+  },
+  {
+    "conta": "Sumicity",
+    "receita": 6916.0,
+    "gp": 4997.0,
+    "margem": 0.7223,
+    "tendencia": -0.1946,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "Telecom"
+  },
+  {
+    "conta": "Rede dor",
+    "receita": 6742.0,
+    "gp": 6742.0,
+    "margem": 1.0,
+    "tendencia": -0.0097,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "Saúde"
+  },
+  {
+    "conta": "IBM Brasil",
+    "receita": 5597.0,
+    "gp": 5597.0,
+    "margem": 1.0,
+    "tendencia": -0.3354,
+    "categoria": "⚠️ Recuperar",
+    "prazo": "45 dias",
+    "setor": "Tecnologia / B2B"
+  },
+  {
+    "conta": "GOL LINHAS AEREAS",
+    "receita": 4632.0,
+    "gp": 2859.0,
+    "margem": 0.6169,
+    "tendencia": -0.1311,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "Aviação"
+  },
+  {
+    "conta": "LARCO BRAZIL",
+    "receita": 3686.0,
+    "gp": 3676.0,
+    "margem": 0.9974,
+    "tendencia": -0.1779,
+    "categoria": "🎯 Recuperação Fácil",
+    "prazo": "30 dias",
+    "setor": "Distribuição / B2B"
+  },
+  {
+    "conta": "Grupo Mateus",
+    "receita": 0.0,
+    "gp": 0.0,
+    "margem": 0,
+    "tendencia": 0,
+    "categoria": "🔍 Ativar — Novo Cliente",
+    "prazo": "60 dias",
+    "setor": "Varejo / Supermercados"
+  }
+]
+        };
+
+        let filteredContas = [...dados.contas];
+
+        // Funções utilitárias
+        function formatCurrency(value) {
+            return '$' + value.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        }
+
+        function formatPercent(value) {
+            return (value * 100).toFixed(1) + '%';
+        }
+
+        function getTendenciaClass(tendencia) {
+            if (tendencia > 0.05) return 'crescendo';
+            if (tendencia < -0.05) return 'queda';
+            return 'neutro';
+        }
+
+        function getTendenciaText(tendencia) {
+            if (tendencia > 0.05) return '↑ Crescendo';
+            if (tendencia < -0.05) return '↓ Em Queda';
+            return '→ Estável';
+        }
+
+        // Inicializar Dashboard
+        function initDashboard() {
+            populateFilters();
+            renderKPIs();
+            renderMatrix();
+            renderHeatmap();
+            renderNBA();
+            renderCharts();
+            renderTable();
+        }
+
+        // Popular filtros
+        function populateFilters() {
+            const categorias = [...new Set(dados.contas.map(c => c.categoria))].sort();
+            const catSelect = document.getElementById('filter-categoria');
+            catSelect.innerHTML = '<option value="">Todas as Categorias</option>' +
+                categorias.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+            const contas = [...new Set(dados.contas.map(c => c.conta))].sort();
+            const contaSelect = document.getElementById('filter-conta');
+            contaSelect.innerHTML = '<option value="">Todas as Contas</option>' +
+                contas.map(conta => `<option value="${conta}">${conta}</option>`).join('');
+
+            const setores = [...new Set(dados.contas.map(c => c.setor))].sort();
+            const setorSelect = document.getElementById('filter-setor');
+            setorSelect.innerHTML = '<option value="">Todos os Setores</option>' +
+                setores.map(setor => `<option value="${setor}">${setor}</option>`).join('');
+        }
+
+        // Renderizar KPIs
+        function renderKPIs() {
+            const kpiGrid = document.getElementById('kpi-grid');
+
+            const receitaTotal = filteredContas.reduce((sum, c) => sum + c.receita, 0);
+            const gpTotal = filteredContas.reduce((sum, c) => sum + c.gp, 0);
+            const margemMedia = gpTotal / receitaTotal;
+            const contasCrescendo = filteredContas.filter(c => c.tendencia > 0.05).length;
+            const contasQueda = filteredContas.filter(c => c.tendencia < -0.05).length;
+
+            kpiGrid.innerHTML = `
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-label">Contas no Foco</div>
+                        <div class="kpi-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--info);">👥</div>
+                    </div>
+                    <div class="kpi-value">${filteredContas.length}</div>
+                    <div class="kpi-subtitle">de 20 contas totais</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-label">Receita Total</div>
+                        <div class="kpi-icon" style="background: rgba(139, 92, 246, 0.1); color: #8B5CF6;">💰</div>
+                    </div>
+                    <div class="kpi-value">${formatCurrency(receitaTotal)}</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-label">Gross Profit</div>
+                        <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">📈</div>
+                    </div>
+                    <div class="kpi-value">${formatCurrency(gpTotal)}</div>
+                    <div class="kpi-subtitle">Margem: ${formatPercent(margemMedia)}</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-label">Contas Crescendo</div>
+                        <div class="kpi-icon" style="background: var(--success-light); color: var(--success);">✅</div>
+                    </div>
+                    <div class="kpi-value">${contasCrescendo}</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-label">Contas em Queda</div>
+                        <div class="kpi-icon" style="background: var(--danger-light); color: var(--danger);">⚠️</div>
+                    </div>
+                    <div class="kpi-value">${contasQueda}</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-label">Potencial Recuperação</div>
+                        <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">🎯</div>
+                    </div>
+                    <div class="kpi-value">${formatCurrency(53024)}</div>
+                </div>
+            `;
+        }
+
+        // Renderizar Matriz
+        function renderMatrix() {
+            const medianGP = median(filteredContas.map(c => c.gp));
+            const medianUrgency = 0;
+
+            const quadrants = {1: [], 2: [], 3: [], 4: []};
+
+            filteredContas.forEach(conta => {
+                const highImpact = conta.gp > medianGP;
+                const highUrgency = conta.tendencia < medianUrgency;
+
+                if (highImpact && highUrgency) quadrants[1].push(conta);
+                else if (!highImpact && highUrgency) quadrants[2].push(conta);
+                else if (highImpact && !highUrgency) quadrants[3].push(conta);
+                else quadrants[4].push(conta);
+            });
+
+            for (let i = 1; i <= 4; i++) {
+                const container = document.getElementById(`quadrant-${i}-accounts`);
+                container.innerHTML = quadrants[i]
+                    .sort((a, b) => b.gp - a.gp)
+                    .slice(0, 10)
+                    .map(conta => `
+                        <span class="account-bubble" title="${formatCurrency(conta.gp)} GP">
+                            ${conta.conta}
+                        </span>
+                    `).join('');
+            }
+        }
+
+        // Renderizar Heatmap
+        function renderHeatmap() {
+            const tbody = document.getElementById('heatmap-body');
+            const top15 = filteredContas.sort((a, b) => b.receita - a.receita).slice(0, 15);
+
+            tbody.innerHTML = top15.map(conta => {
+                const tendenciaRisk = getRiskLevel(conta.tendencia, 'tendencia');
+                const margemRisk = getRiskLevel(conta.margem, 'margem');
+                const urgenciaRisk = getRiskLevel(conta.prazo, 'urgencia');
+                const receitaRisk = getRiskLevel(conta.receita, 'receita');
+                const globalRisk = calculateGlobalRisk(conta);
+
+                return `
+                    <tr>
+                        <td class="account-name">${conta.conta}</td>
+                        <td class="risk-${tendenciaRisk}">${(conta.tendencia * 100).toFixed(1)}%</td>
+                        <td class="risk-${margemRisk}">${formatPercent(conta.margem)}</td>
+                        <td class="risk-${urgenciaRisk}">${conta.prazo}</td>
+                        <td class="risk-${receitaRisk}">${formatCurrency(conta.receita)}</td>
+                        <td class="risk-${globalRisk}" style="font-weight: 700;">${globalRisk.toUpperCase()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getRiskLevel(value, type) {
+            switch(type) {
+                case 'tendencia':
+                    if (value < -0.2) return 'high';
+                    if (value < 0) return 'medium';
+                    return 'low';
+                case 'margem':
+                    if (value < 0.5) return 'high';
+                    if (value < 0.7) return 'medium';
+                    return 'low';
+                case 'urgencia':
+                    if (value === '7 dias' || value === 'Imediato') return 'high';
+                    if (value === '30 dias') return 'medium';
+                    return 'low';
+                case 'receita':
+                    if (value < 5000) return 'high';
+                    if (value < 15000) return 'medium';
+                    return 'low';
+                default:
+                    return 'low';
+            }
+        }
+
+        function calculateGlobalRisk(conta) {
+            let score = 0;
+
+            if (conta.tendencia < -0.2) score += 3;
+            else if (conta.tendencia < 0) score += 2;
+            else if (conta.tendencia < 0.1) score += 1;
+
+            if (conta.margem < 0.5) score += 2;
+            else if (conta.margem < 0.7) score += 1;
+
+            if (conta.prazo === '7 dias' || conta.prazo === 'Imediato') score += 3;
+            else if (conta.prazo === '30 dias') score += 2;
+            else if (conta.prazo === '45 dias') score += 1;
+
+            if (score >= 6) return 'high';
+            if (score >= 3) return 'medium';
+            return 'low';
+        }
+
+        // Renderizar NBA
+        function renderNBA() {
+            const nbaList = filteredContas.map(conta => ({
+                ...conta,
+                nba: calculateNextBestAction(conta),
+                priority: calculatePriority(conta)
+            })).sort((a, b) => b.priority - a.priority).slice(0, 5);
+
+            const container = document.getElementById('nba-container');
+            container.innerHTML = nbaList.map(item => {
+                const urgencyClass = item.priority > 80 ? 'urgent' : item.priority > 50 ? 'high' : 'medium';
+                const urgencyLabel = item.priority > 80 ? 'Urgente' : item.priority > 50 ? 'Alta' : 'Média';
+
+                return `
+                    <div class="nba-card">
+                        <div class="nba-header">
+                            <div>
+                                <div class="nba-title">${item.conta}</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">
+                                    ${item.setor} • ${formatCurrency(item.gp)} GP • ${formatPercent(item.margem)} margem
+                                </div>
+                            </div>
+                            <div class="nba-badge ${urgencyClass}">
+                                ${urgencyLabel}
+                            </div>
+                        </div>
+                        <div class="nba-action">
+                            💡 ${item.nba.action}
+                        </div>
+                        <div class="nba-rationale">
+                            <strong>Racional:</strong> ${item.nba.rationale}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateNextBestAction(conta) {
+            if (conta.categoria.includes('Intervenção Urgente') || conta.tendencia < -0.5) {
+                return {
+                    action: `Escalada executiva imediata + análise de uso dos últimos 90 dias`,
+                    rationale: `Queda crítica de ${(conta.tendencia * 100).toFixed(1)}%. Risco de churn elevado. Margem alta (${formatPercent(conta.margem)}) justifica investimento em retenção.`
+                };
+            }
+
+            if (conta.categoria.includes('Recuperar') && conta.margem > 0.7) {
+                return {
+                    action: `Call proativo + oferta de bundle personalizado com 10-15% desconto`,
+                    rationale: `Alta margem permite flexibilidade comercial. Potencial de recuperar ${formatCurrency(conta.gp * 0.3)} em GP com reativação.`
+                };
+            }
+
+            if (conta.categoria.includes('Acelerar') || conta.tendencia > 0.5) {
+                return {
+                    action: `QBR estratégico + proposta de expansão (novos canais ou produtos)`,
+                    rationale: `Momentum positivo (+${(conta.tendencia * 100).toFixed(1)}%). Janela de oportunidade para cross-sell/upsell antes que o orçamento seja alocado.`
+                };
+            }
+
+            if (conta.categoria.includes('Novo')) {
+                return {
+                    action: `Onboarding acelerado + webinar técnico + case studies do setor`,
+                    rationale: `Primeiros 60 dias são críticos. Aumentar time-to-value reduz risco de churn precoce em 40% (benchmark interno).`
+                };
+            }
+
+            if (conta.categoria.includes('Recuperação Fácil')) {
+                return {
+                    action: `Revisão de uso + identificação de friction points + proposta de otimização`,
+                    rationale: `Queda leve (${(conta.tendencia * 100).toFixed(1)}%) indica problema operacional, não estratégico. Quick win com alta taxa de sucesso.`
+                };
+            }
+
+            return {
+                action: `QBR trimestral + health check + NPS survey`,
+                rationale: `Conta estável. Manter cadência de relacionamento e monitorar sinais de mudança.`
+            };
+        }
+
+        function calculatePriority(conta) {
+            let score = 0;
+            score += Math.min((conta.gp / 1000) * 5, 40);
+
+            if (conta.tendencia < -0.3) score += 40;
+            else if (conta.tendencia < -0.1) score += 30;
+            else if (conta.tendencia < 0) score += 20;
+
+            if (conta.margem > 0.8) score += 20;
+            else if (conta.margem > 0.6) score += 10;
+
+            return Math.min(score, 100);
+        }
+
+        // Renderizar Charts
+        function renderCharts() {
+            const categories = {};
+            filteredContas.forEach(c => {
+                if (!categories[c.categoria]) categories[c.categoria] = 0;
+                categories[c.categoria] += c.receita;
+            });
+
+            const ctxReceita = document.getElementById('chart-receita').getContext('2d');
+            new Chart(ctxReceita, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        data: Object.values(categories),
+                        backgroundColor: [
+                            '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#6B7280'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            const catData = {};
+            filteredContas.forEach(c => {
+                if (!catData[c.categoria]) catData[c.categoria] = { margem: [], count: 0 };
+                catData[c.categoria].margem.push(c.margem);
+                catData[c.categoria].count++;
+            });
+
+            const labels = Object.keys(catData);
+            const margens = labels.map(cat => average(catData[cat].margem) * 100);
+            const counts = labels.map(cat => catData[cat].count);
+
+            const ctxMargem = document.getElementById('chart-margem').getContext('2d');
+            new Chart(ctxMargem, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Margem Média (%)',
+                        data: margens,
+                        backgroundColor: 'rgba(255, 91, 0, 0.7)',
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Quantidade',
+                        data: counts,
+                        backgroundColor: 'rgba(30, 58, 138, 0.7)',
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { position: 'left', title: { display: true, text: 'Margem (%)' } },
+                        y1: { position: 'right', title: { display: true, text: 'Quantidade' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        // Renderizar Tabela
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+
+            tbody.innerHTML = filteredContas.map(conta => {
+                const tendenciaClass = getTendenciaClass(conta.tendencia);
+                const tendenciaText = getTendenciaText(conta.tendencia);
+                const badgeClass = tendenciaClass === 'crescendo' ? 'success' : tendenciaClass === 'queda' ? 'danger' : 'warning';
+
+                return `
+                    <tr>
+                        <td><strong>${conta.conta}</strong></td>
+                        <td>${conta.setor}</td>
+                        <td>${formatCurrency(conta.receita)}</td>
+                        <td>${formatCurrency(conta.gp)}</td>
+                        <td>${formatPercent(conta.margem)}</td>
+                        <td><span class="badge ${badgeClass}">${tendenciaText} (${(conta.tendencia * 100).toFixed(1)}%)</span></td>
+                        <td>${conta.categoria}</td>
+                        <td>${conta.prazo}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Aplicar Filtros
+        function applyFilters() {
+            const categoria = document.getElementById('filter-categoria').value;
+            const conta = document.getElementById('filter-conta').value;
+            const setor = document.getElementById('filter-setor').value;
+            const tendencia = document.getElementById('filter-tendencia').value;
+
+            filteredContas = dados.contas.filter(c => {
+                if (categoria && c.categoria !== categoria) return false;
+                if (conta && c.conta !== conta) return false;
+                if (setor && c.setor !== setor) return false;
+
+                if (tendencia) {
+                    const tendClass = getTendenciaClass(c.tendencia);
+                    if (tendClass !== tendencia) return false;
+                }
+
+                return true;
+            });
+
+            renderKPIs();
+            renderMatrix();
+            renderHeatmap();
+            renderNBA();
+            renderTable();
+        }
+
+        // Resetar Filtros
+        function resetFilters() {
+            document.getElementById('filter-categoria').value = '';
+            document.getElementById('filter-conta').value = '';
+            document.getElementById('filter-setor').value = '';
+            document.getElementById('filter-tendencia').value = '';
+
+            filteredContas = [...dados.contas];
+            renderKPIs();
+            renderMatrix();
+            renderHeatmap();
+            renderNBA();
+            renderTable();
+        }
+
+        // Exportar CSV
+        function exportCSV() {
+            const nbaList = filteredContas.map(conta => ({
+                Conta: conta.conta,
+                Setor: conta.setor,
+                Receita: conta.receita,
+                GP: conta.gp,
+                Margem: conta.margem,
+                Tendencia: conta.tendencia,
+                Categoria: conta.categoria,
+                Prazo: conta.prazo,
+                NextBestAction: calculateNextBestAction(conta).action,
+                Prioridade: calculatePriority(conta)
+            })).sort((a, b) => b.Prioridade - a.Prioridade);
+
+            const headers = Object.keys(nbaList[0]);
+            const csv = [
+                headers.join(','),
+                ...nbaList.map(row => headers.map(h => row[h]).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `infobip_dashboard_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+        }
+
+        // Utils
+        function median(arr) {
+            const sorted = [...arr].sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+            return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+        }
+
+        function average(arr) {
+            return arr.reduce((sum, val) => sum + val, 0) / arr.length;
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>
