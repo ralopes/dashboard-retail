@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mid Pyramid Customers Retail & Telco</title>
+    <title>Infobip Retail Dashboard V2 | Dados Reais</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
@@ -625,7 +625,7 @@
         <div class="navbar-brand">
             <div class="logo">I</div>
             <div class="brand-text">
-                <h1>Mid Pyramid Customers Retail & Telco</h1>
+                <h1>Infobip Retail Dashboard</h1>
                 <p>V2 - Dados Reais da Carteira</p>
             </div>
         </div>
@@ -665,7 +665,14 @@
                         <option value="crescendo">Crescendo</option>
                         <option value="queda">Em Queda</option>
                         <option value="neutro">Neutro</option>
+                    
+                <div class="filter-group">
+                    <label>Account Owner</label>
+                    <select id="filter-account-owner">
+                        <option value="">Todos os Account Owners</option>
                     </select>
+                </div>
+            </select>
                 </div>
             </div>
             <div class="filter-actions">
@@ -749,6 +756,7 @@
                 <thead>
                     <tr>
                         <th>Conta</th>
+                        <th>Account Owner</th>
                         <th>Setor</th>
                         <th>Receita</th>
                         <th>GP</th>
@@ -764,9 +772,21 @@
     </main>
 
     <script>
+        // VERIFICAÇÃO DE AUTENTICAÇÃO
+        if (sessionStorage.getItem('dashboard_autenticado') !== 'true') {
+            window.location.href = 'index.html';
+        }
+
+        // Função de logout (pode adicionar botão depois se quiser)
+        function logout() {
+            sessionStorage.removeItem('dashboard_autenticado');
+            window.location.href = 'index.html';
+        }
+
         // DADOS REAIS EXTRAÍDOS DO EXCEL
         const dados = {
             contas: [
+[
   {
     "conta": "Wiser",
     "receita": 26062.0,
@@ -775,7 +795,8 @@
     "tendencia": -0.3651,
     "categoria": "⚠️ Recuperar",
     "prazo": "45 dias",
-    "setor": "Tecnologia / SaaS"
+    "setor": "Tecnologia / SaaS",
+    "accountOwner": "Anne Tulio"
   },
   {
     "conta": "Azul Linhas Aereas",
@@ -785,7 +806,8 @@
     "tendencia": 0.0265,
     "categoria": "📈 Manter Momentum",
     "prazo": "30 dias",
-    "setor": "Aviação"
+    "setor": "Aviação",
+    "accountOwner": "Julia Nunes"
   },
   {
     "conta": "Hospital Oswaldo Cruz",
@@ -795,7 +817,8 @@
     "tendencia": -0.1928,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "Saúde"
+    "setor": "Saúde",
+    "accountOwner": "Julia Nunes"
   },
   {
     "conta": "McDonalds Brazil",
@@ -805,7 +828,8 @@
     "tendencia": -0.7945,
     "categoria": "🚨 Intervenção Urgente",
     "prazo": "7 dias",
-    "setor": "Food & Beverage"
+    "setor": "Food & Beverage",
+    "accountOwner": "Cintya Camargo"
   },
   {
     "conta": "Outback Brazil",
@@ -815,7 +839,8 @@
     "tendencia": 0.3134,
     "categoria": "📈 Manter Momentum",
     "prazo": "30 dias",
-    "setor": "Food & Beverage"
+    "setor": "Food & Beverage",
+    "accountOwner": "Anne Tulio"
   },
   {
     "conta": "Pernod Ricard",
@@ -825,7 +850,8 @@
     "tendencia": -0.0039,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "Bebidas / FMCG"
+    "setor": "Bebidas / FMCG",
+    "accountOwner": "Anne Tulio"
   },
   {
     "conta": "MaxMilhas",
@@ -835,7 +861,8 @@
     "tendencia": 0.3049,
     "categoria": "📈 Manter Momentum",
     "prazo": "30 dias",
-    "setor": "Viagens / Fidelidade"
+    "setor": "Viagens / Fidelidade",
+    "accountOwner": "Julia Nunes"
   },
   {
     "conta": "Positivo Tecnologia",
@@ -845,7 +872,8 @@
     "tendencia": -0.019,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "Tecnologia"
+    "setor": "Tecnologia",
+    "accountOwner": "Julia Nunes"
   },
   {
     "conta": "Ecohouse",
@@ -855,7 +883,8 @@
     "tendencia": 0.2633,
     "categoria": "🚀 Acelerar",
     "prazo": "Imediato",
-    "setor": "Energia / ESG"
+    "setor": "Energia / ESG",
+    "accountOwner": "Cintya Camargo"
   },
   {
     "conta": "Burger King Brasil",
@@ -865,17 +894,19 @@
     "tendencia": -0.0257,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "Food & Beverage"
+    "setor": "Food & Beverage",
+    "accountOwner": "Cintya Camargo"
   },
   {
     "conta": "Cia Hering",
     "receita": 11583.0,
     "gp": 5511.0,
     "margem": 0.476,
-    "tendencia": 0,
+    "tendencia": 0.0,
     "categoria": "🔍 Ativar — Novo Cliente",
     "prazo": "60 dias",
-    "setor": "Varejo / Moda"
+    "setor": "Varejo / Moda",
+    "accountOwner": "Josue Moro"
   },
   {
     "conta": "Edenred Brazil - Freto",
@@ -885,7 +916,8 @@
     "tendencia": -0.0191,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "RH / Benefícios"
+    "setor": "RH / Benefícios",
+    "accountOwner": "Julia Nunes"
   },
   {
     "conta": "Boticario Brazil",
@@ -895,7 +927,8 @@
     "tendencia": 1.7927,
     "categoria": "🚀 Acelerar",
     "prazo": "Imediato",
-    "setor": "Beleza / Cosméticos"
+    "setor": "Beleza / Cosméticos",
+    "accountOwner": "Cintya Camargo"
   },
   {
     "conta": "Atlas Schindler",
@@ -905,7 +938,8 @@
     "tendencia": -0.3928,
     "categoria": "⚠️ Recuperar",
     "prazo": "45 dias",
-    "setor": "Elevadores / B2B"
+    "setor": "Elevadores / B2B",
+    "accountOwner": "Anne Tulio"
   },
   {
     "conta": "Sumicity",
@@ -915,7 +949,8 @@
     "tendencia": -0.1946,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "Telecom"
+    "setor": "Telecom",
+    "accountOwner": "Josue Moro"
   },
   {
     "conta": "Rede dor",
@@ -925,7 +960,8 @@
     "tendencia": -0.0097,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "Saúde"
+    "setor": "Saúde",
+    "accountOwner": "Julia Nunes"
   },
   {
     "conta": "IBM Brasil",
@@ -935,7 +971,8 @@
     "tendencia": -0.3354,
     "categoria": "⚠️ Recuperar",
     "prazo": "45 dias",
-    "setor": "Tecnologia / B2B"
+    "setor": "Tecnologia / B2B",
+    "accountOwner": "Cintya Camargo"
   },
   {
     "conta": "GOL LINHAS AEREAS",
@@ -945,7 +982,8 @@
     "tendencia": -0.1311,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "Aviação"
+    "setor": "Aviação",
+    "accountOwner": "Anne Tulio"
   },
   {
     "conta": "LARCO BRAZIL",
@@ -955,19 +993,22 @@
     "tendencia": -0.1779,
     "categoria": "🎯 Recuperação Fácil",
     "prazo": "30 dias",
-    "setor": "Distribuição / B2B"
+    "setor": "Distribuição / B2B",
+    "accountOwner": "Cintya Camargo"
   },
   {
     "conta": "Grupo Mateus",
     "receita": 0.0,
     "gp": 0.0,
-    "margem": 0,
-    "tendencia": 0,
+    "margem": 0.0,
+    "tendencia": 0.0,
     "categoria": "🔍 Ativar — Novo Cliente",
     "prazo": "60 dias",
-    "setor": "Varejo / Supermercados"
+    "setor": "Varejo / Supermercados",
+    "accountOwner": "Não atribuído"
   }
 ]
+            ]
         };
 
         let filteredContas = [...dados.contas];
@@ -1020,6 +1061,11 @@
             const setorSelect = document.getElementById('filter-setor');
             setorSelect.innerHTML = '<option value="">Todos os Setores</option>' +
                 setores.map(setor => `<option value="${setor}">${setor}</option>`).join('');
+
+            const accountOwners = [...new Set(dados.contas.map(c => c.accountOwner))].sort();
+            const ownerSelect = document.getElementById('filter-account-owner');
+            ownerSelect.innerHTML = '<option value="">Todos os Account Owners</option>' +
+                accountOwners.map(owner => `<option value="${owner}">${owner}</option>`).join('');
         }
 
         // Renderizar KPIs
@@ -1355,6 +1401,7 @@
                 return `
                     <tr>
                         <td><strong>${conta.conta}</strong></td>
+                        <td>${conta.accountOwner}</td>
                         <td>${conta.setor}</td>
                         <td>${formatCurrency(conta.receita)}</td>
                         <td>${formatCurrency(conta.gp)}</td>
@@ -1373,11 +1420,13 @@
             const conta = document.getElementById('filter-conta').value;
             const setor = document.getElementById('filter-setor').value;
             const tendencia = document.getElementById('filter-tendencia').value;
+            const accountOwner = document.getElementById('filter-account-owner').value;
 
             filteredContas = dados.contas.filter(c => {
                 if (categoria && c.categoria !== categoria) return false;
                 if (conta && c.conta !== conta) return false;
                 if (setor && c.setor !== setor) return false;
+                if (accountOwner && c.accountOwner !== accountOwner) return false;
 
                 if (tendencia) {
                     const tendClass = getTendenciaClass(c.tendencia);
@@ -1400,6 +1449,7 @@
             document.getElementById('filter-conta').value = '';
             document.getElementById('filter-setor').value = '';
             document.getElementById('filter-tendencia').value = '';
+            document.getElementById('filter-account-owner').value = '';
 
             filteredContas = [...dados.contas];
             renderKPIs();
